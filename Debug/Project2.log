@@ -1,0 +1,13 @@
+﻿  Shader.cpp
+  Source.cpp
+e:\cours\computer_graphics\project2\project2\mesh.h(20): warning C4091: 'static ' : ignoré à gauche de 'Mesh::MeshEntry::BUFFERS' quand aucune variable n'est déclarée
+e:\cours\computer_graphics\project2\project2\source.cpp(159): warning C4244: 'argument' : conversion de 'int' en 'float', perte possible de données
+e:\cours\computer_graphics\project2\project2\source.cpp(163): warning C4305: 'initialisation' : troncation de 'double' à 'float'
+  MyGlWindow.cpp
+e:\cours\computer_graphics\project2\project2\mesh.h(20): warning C4091: 'static ' : ignoré à gauche de 'Mesh::MeshEntry::BUFFERS' quand aucune variable n'est déclarée
+e:\cours\computer_graphics\project2\project2\myglwindow.cpp(50): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+e:\cours\computer_graphics\project2\project2\myglwindow.cpp(51): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+e:\cours\computer_graphics\project2\project2\myglwindow.cpp(147): warning C4244: 'initialisation' : conversion de 'float' en 'int', perte possible de données
+  Génération de code en cours...
+LINK : warning LNK4098: conflit entre la bibliothΦque par dΘfaut 'MSVCRT' et les autres bibliothΦquesá; utilisez /NODEFAULTLIB:library
+  Project2.vcxproj -> E:\Cours\Computer_Graphics\Project2\Debug\Project2.exe
