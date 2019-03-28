@@ -37,7 +37,7 @@ radius(rad), slices(sl), stacks(st), _shader(shader)
 	generateVerts(v, n, tex, el);
 
 	//create vao, vbo and ibo here... (We didn't use std::vector here...)
-	texture.loadTexture("img/earth.jpg");
+	_texture.loadTexture("earth.jpg");
 	setup(v, n, el, tex);
 
 	delete[] v;
@@ -112,8 +112,8 @@ void Sphere::setup(float *vertices, float *normals, unsigned int *el, float *tex
 void Sphere::draw() 
 {
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture.getIdNumber(0));
-	glUniform1i(_shader->uniform("Tex1"), 0);
+	glBindTexture(GL_TEXTURE_2D, _texture.getIdNumber(0));
+	glUniform1i(_shader->uniform("ColorTex"), 0);
 
 	glBindVertexArray(VAO);
 	int size;

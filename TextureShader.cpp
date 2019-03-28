@@ -21,38 +21,24 @@ void TextureShader::addUniforms()
 	m_shaderProgram->addUniform("ModelViewMatrix"); //View*Model : mat4
 	m_shaderProgram->addUniform("NormalMatrix"); //Refer next slide : mat3
 
-	m_shaderProgram->addUniform("Tex1");
+	m_shaderProgram->addUniform("ColorTex");
 	m_shaderProgram->addUniform("Tex2");
 
 	for (int i = 0; i < 5; i++) {
-		std::string name, name1, name2, name3, name4, name5, name6;
+		std::string name, name1, name2, name3;
 		name = "Light[";
 		name1 = name + std::to_string(i) + "].Position";
 		name2 = name + std::to_string(i) + "].Intensity";
 		name3 = name + std::to_string(i) + "].Direction";
-		name4 = name + std::to_string(i) + "].cutOff";
-		name5 = name + std::to_string(i) + "].innerCutOff";
-		name6 = name + std::to_string(i) + "].exponent";
 		m_shaderProgram->addUniform(name1);
 		m_shaderProgram->addUniform(name2);
 		m_shaderProgram->addUniform(name3);
-		m_shaderProgram->addUniform(name4);
-		m_shaderProgram->addUniform(name5);
-		m_shaderProgram->addUniform(name6);
 	}
 }
 
 void TextureShader::setUniforms(glm::mat4 view, Parameter param)
 {
 	// set the "material" parameter
-	glm::vec3 Ka(0.3, 0.3, 0.3);
-	glm::vec3 Kd(1.0, 1.0, 1.0);
-	glm::vec3 Ks(0.3, 0.3, 0.3);
-	GLfloat shiness = 10.0f;
-	glUniform3fv(m_shaderProgram->uniform("Kd"), 1, glm::value_ptr(Kd));
-	glUniform3fv(m_shaderProgram->uniform("Ka"), 1, glm::value_ptr(Ka));
-	glUniform3fv(m_shaderProgram->uniform("Ks"), 1, glm::value_ptr(Ks));
-	glUniform1f(m_shaderProgram->uniform("shininess"), shiness);
 
 	// set the lights parameters
 	glUniform3fv(m_shaderProgram->uniform("Light[0].Intensity"), 1, glm::value_ptr(glm::vec3(0.0f, 0.8f, 0.8f)));
@@ -74,8 +60,5 @@ void TextureShader::setUniforms(glm::mat4 view, Parameter param)
 		glm::vec4 direction = view * glm::vec4(0, 0, 0, 1) - viewPos;
 		glUniform4fv(m_shaderProgram->uniform("Light[" + std::to_string(i) + "].Position"), 1, glm::value_ptr(viewPos));
 		glUniform4fv(m_shaderProgram->uniform("Light[" + std::to_string(i) + "].Direction"), 1, glm::value_ptr(direction));
-		glUniform1f(m_shaderProgram->uniform("Light[" + std::to_string(i) + "].cutOff"), 40.0f);
-		glUniform1f(m_shaderProgram->uniform("Light[" + std::to_string(i) + "].innerCutOff"), 30.0f);
-		glUniform1f(m_shaderProgram->uniform("Light[" + std::to_string(i) + "].exponent"), 10.0f);
 	}
 }

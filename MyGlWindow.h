@@ -22,6 +22,7 @@
 #include "Material.h"
 #include "TextureShader.h"
 #include "PhongShader.h"
+#include "NormalMapShader.h"
 
 class MyGlWindow {
 public:
@@ -37,6 +38,7 @@ private:
 	//Shaders
 	TextureShader *m_TextureShader;
 	PhongShader *m_PhongShader;
+	NormalMapShader *m_NormalMapShader;
 	
 	ShaderProgram *m_shaderProgramSil;
 	ShaderProgram *m_shaderProgramFloor;
@@ -56,6 +58,8 @@ private:
 	IObject *m_dragon;
 	IObject *m_bunny;
 	IObject *m_plane;
+	IObject *m_moutain;
+	IObject *m_ogre;
 
 	Model m_model;
 

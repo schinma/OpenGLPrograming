@@ -20,10 +20,9 @@ MyGlWindow::MyGlWindow(float w, float h)
 	m_sphere = new Sphere(2, 100, 100, m_TextureShader->getShaderProgram());
 	m_teapot = new VBOTeapot(8, glm::mat4(1.0));
 	m_teapot2 = new VBOTeapot(8, glm::mat4(1.0));
-	m_buddha = new Mesh("buddha.obj", m_TextureShader->getShaderProgram());
-	m_dragon = new Mesh("dragon.obj", m_TextureShader->getShaderProgram());
-	m_bunny = new Mesh("bunny.obj", m_TextureShader->getShaderProgram());
 	m_plane = new Plane(100, 20);
+	m_moutain = new Mesh("mount.blend1.obj", m_TextureShader->getShaderProgram());
+	m_ogre = new Mesh("bs_ears.obj", m_NormalMapShader->getShaderProgram());
 
 	glm::vec3 viewPoint(DEFAULT_VIEW_POINT[0], DEFAULT_VIEW_POINT[1], DEFAULT_VIEW_POINT[2]);
 	glm::vec3 viewCenter(DEFAULT_VIEW_CENTER[0], DEFAULT_VIEW_CENTER[1], DEFAULT_VIEW_CENTER[2]);
@@ -39,9 +38,6 @@ MyGlWindow::~MyGlWindow()
 	delete(m_color_cube);
 	delete(m_sphere);
 	delete(m_teapot);
-	delete(m_buddha);
-	delete(m_bunny);
-	delete(m_dragon);
 	delete(m_plane);
 	delete(m_TextureShader);
 	delete(m_PhongShader);
@@ -49,6 +45,8 @@ MyGlWindow::~MyGlWindow()
 	delete(m_shaderProgramSil);
 	delete(m_shaderProgramFloor);
 	delete(m_viewer);
+	delete(m_NormalMapShader);
+	delete(m_ogre);
 }
 
 void MyGlWindow::resize(int width, int height) {
@@ -60,6 +58,7 @@ void MyGlWindow::setupBuffer()
 {
 	m_TextureShader = new TextureShader();
 	m_PhongShader = new PhongShader();
+	m_NormalMapShader = new NormalMapShader();
 
 	m_shaderProgramSil = new ShaderProgram();
 	m_shaderProgramSil->initFromFiles("shaders/silhouette.vert", "shaders/silhouette.frag");	
@@ -71,6 +70,7 @@ void MyGlWindow::setupBuffer()
 	
 	m_TextureShader->addUniforms();
 	m_PhongShader->addUniforms();
+	m_NormalMapShader->addUniforms();
 
 	m_shaderProgramSil->addUniform("mvp");
 	m_shaderProgramSil->addUniform("u_offset");
@@ -96,40 +96,26 @@ void MyGlWindow::draw(Parameter param)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	//Texture Shader
 	m_TextureShader->getShaderProgram()->use();
 	m_TextureShader->setUniforms(view, param);
-
-	// Draw the Color Cube
-
-
 	
 	draw_object(m_color_cube, m_TextureShader, projection, view, glm::vec3(0, 1, 0), std::vector<glm::vec4>{glm::vec4(-90, 1, 0, 0)});
 
-	rotAngle++;
+	//rotAngle++;
 	draw_object(m_sphere, m_TextureShader, projection, view, glm::vec3(0, 3, 5), std::vector<glm::vec4>{glm::vec4(270, 1, 0, 0), glm::vec4(rotAngle, 0, 0, 1)});
 
+	draw_object(m_moutain, m_TextureShader, projection, view, glm::vec3(10, 4, 10), std::vector<glm::vec4>{glm::vec4(45, 0, 1, 0)});
 
-	// draw the sphere 
-	
-	// draw the teapot	
-	/*glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-
-	draw_object(m_teapot, projection, view, glm::vec3(-2, 0, -5), glm::vec4(-90, 1, 0, 0));
-	draw_object(m_teapot, projection, view, glm::vec3(5, 0, 5), glm::vec4(-90, 1, 0, 0));
-
-
-	glDisable(GL_CULL_FACE);*/
-
-	// draw the buddha		
-	//draw_object(m_buddha, projection, view, glm::vec3(10, 4, 10), glm::vec4(45, 0, 1, 0), glm::vec3(10, 10, 10));
-
-	// draw the dragon	
-	//draw_object(m_dragon, projection, view, glm::vec3(0, 3, 0), glm::vec4(0, 0, 0, 0), glm::vec3(10, 10, 10));
-
-	// draw the bunny
-	//draw_object(m_bunny, projection, view, glm::vec3(10, 0, -10), glm::vec4(0, 0, 0, 0), glm::vec3(5, 5, 5));	
 	m_TextureShader->getShaderProgram()->disable();
+
+	//Normal Map Shader
+	m_NormalMapShader->getShaderProgram()->use();
+	m_NormalMapShader->setUniforms(view, param);
+
+	draw_object(m_ogre, m_NormalMapShader, projection, view, glm::vec3(-10, 4, -10), std::vector<glm::vec4>{}, glm::vec3(5, 5, 5));
+	
+	m_NormalMapShader->getShaderProgram()->disable();
 	
 	m_PhongShader->getShaderProgram()->use();	
 	m_PhongShader->setUniforms(view, param);
@@ -138,19 +124,6 @@ void MyGlWindow::draw(Parameter param)
 	
 	m_PhongShader->getShaderProgram()->disable();
 
-	/*m_shaderProgramSil->use();
-
-	glUniform1f(m_shaderProgramSil->uniform("u_offset"), 0.05f);
-	glUniform3fv(m_shaderProgramSil->uniform("u_color"), 1, glm::value_ptr(glm::vec3(0.1f, 0.1f, 0.1f)));
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-
-	draw_object(m_teapot2, projection, view, glm::vec3(-2, 0, -5), glm::vec4(-90, 1, 0, 0));
-
-	glDisable(GL_CULL_FACE);
-
-	m_shaderProgramSil->disable();*/
 }
 
 void MyGlWindow::draw_object(IObject *object, Shader * shader, glm::mat4 projection, glm::mat4 view, glm::vec3 translation, std::vector<glm::vec4> rotations, glm::vec3 scale)

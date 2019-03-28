@@ -19,7 +19,7 @@ glm::vec3 ColorCube::computeNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 void ColorCube::setup()
 {
 	//setup texture
-	_texture.loadTexture("img/brick1.jpg", "img/moss.png");
+	_texture.loadTexture("brick1.jpg", "moss.png");
 
 	// Generate the vertices
 
@@ -207,7 +207,7 @@ void ColorCube::draw()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _texture.getIdNumber(0));
-	glUniform1i(_shader->uniform("Tex1"), 0);
+	glUniform1i(_shader->uniform("ColorTex"), 0);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, _texture.getIdNumber(1));

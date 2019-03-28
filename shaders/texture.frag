@@ -13,12 +13,9 @@ struct LightInfo {
 	vec4 Position;
 	vec4 Direction;
 	vec3 Intensity; //color
-	float exponent;
-	float cutOff;
-	float innerCutOff;
 };
 
-uniform sampler2D Tex1;
+uniform sampler2D ColorTex;
 uniform sampler2D Tex2;
 
 uniform LightInfo Light[5];
@@ -52,7 +49,7 @@ void main()
 	
 	color += ambient;
 
-	vec4 texColor = texture(Tex1, TexCoord);
+	vec4 texColor = texture(ColorTex, TexCoord);
 	vec4 texColor2 = texture(Tex2, TexCoord);
 	vec4 texColor3 = mix(texColor2, texColor, texColor2.a);
 

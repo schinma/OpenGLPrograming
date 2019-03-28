@@ -26,6 +26,8 @@ Mesh::MeshEntry::MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m)
 	vbo[TEXCOORD_BUFFER] = NULL;
 	vbo[NORMAL_BUFFER] = NULL;
 	vbo[INDEX_BUFFER] = NULL;
+	vbo[TANGENT_BUFFER] = NULL;
+	vbo[BITTANGENT_BUFFER] = NULL;
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -87,6 +89,38 @@ Mesh::MeshEntry::MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m)
 		delete[] normals;
 	}
 
+	if (mesh->HasTangentsAndBitangents()) {
+
+		float *tangent = new float[mesh->mNumVertices * 3];
+		for (int i = 0; i < mesh->mNumVertices; ++i) {
+			tangent[i * 3] = mesh->mTangents[i].x;
+			tangent[i * 3 + 1] = mesh->mTangents[i].y;
+			tangent[i * 3 + 2] = mesh->mTangents[i].z;
+		}
+		float *bittangent = new float[mesh->mNumVertices * 3];
+		for (int i = 0; i < mesh->mNumVertices; ++i) {
+			bittangent[i * 3] = mesh->mBitangents[i].x;
+			bittangent[i * 3 + 1] = mesh->mBitangents[i].y;
+			bittangent[i * 3 + 2] = mesh->mBitangents[i].z;
+		}
+
+		glGenBuffers(1, &vbo[TANGENT_BUFFER]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[TANGENT_BUFFER]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * mesh->mNumVertices * sizeof(GLuint), tangent, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(4);
+
+		glGenBuffers(1, &vbo[BITTANGENT_BUFFER]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[BITTANGENT_BUFFER]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * mesh->mNumVertices * sizeof(GLuint), bittangent, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(5);
+
+		delete[] tangent;
+		delete[] bittangent;
+	}
 
 	if (mesh->HasFaces()) {
 		unsigned int *indices = new unsigned int[mesh->mNumFaces * 3];
@@ -140,16 +174,14 @@ Mesh::MeshEntry::~MeshEntry() {
 	}
 
 	glDeleteVertexArrays(1, &vao);
-
 	
 }
 
 /**
 *	Renders this MeshEntry
 **/
-void Mesh::MeshEntry::render() {
-	
-	
+void Mesh::MeshEntry::render(ShaderProgram *shader) {
+
 	glBindVertexArray(vao);
 		int size;
 		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -168,7 +200,7 @@ Mesh::Mesh(const char *filename, ShaderProgram * sh)
 	fullname = std::string("./Models/")+ std::string(filename);
 
 	Assimp::Importer importer;   //aiProcessPreset_TargetRealtime_Fast
-	const aiScene* scene = importer.ReadFile(fullname.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_OptimizeMeshes);
+	const aiScene* scene = importer.ReadFile(fullname.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_OptimizeMeshes | aiProcess_CalcTangentSpace);
 
 	// Check for errors
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
@@ -177,11 +209,45 @@ Mesh::Mesh(const char *filename, ShaderProgram * sh)
 		return;
 	}
 
+	for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
+
+		const aiMaterial *pMaterial = scene->mMaterials[i];
+
+		if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+			aiString path;
+			if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path,
+				NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+				std::string fullPath = path.data;
+				Texture texture(Texture::DIFFUSE);
+				std::cout << fullPath << std::endl;
+				texture.loadTexture(fullPath);
+				textures.push_back(texture);
+			}
+		}
+
+		if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+			aiString path;
+			if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &path,
+				NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+				std::string fullPath = path.data;
+				Texture texture(Texture::NORMAL);
+				texture.loadTexture(fullPath);
+				textures.push_back(texture);
+			}
+		}
+	}
+
+	/*Texture texture(Texture::DIFFUSE);
+	texture.loadTexture("ogre_diffuse.png");
+	textures.push_back(texture);
+
+	Texture texture2(Texture::NORMAL);
+	texture.loadTexture("ogre_normalmap.png");
+	textures.push_back(texture2);*/
+
 	for (int i = 0; i < scene->mNumMeshes; ++i) {
 		meshEntries.push_back(new Mesh::MeshEntry(scene->mMeshes[i], scene, this));
-	}
-	   	
-	
+	}	
 }
 
 /**
@@ -202,14 +268,15 @@ Mesh::~Mesh(void)
 void Mesh::draw() {
 
 	//shader->use();
+
 	for (int i = 0; i < meshEntries.size(); ++i) {
 
 		MeshEntry * m = meshEntries[i];
 		
 
-		glm::vec3 diffuse = glm::vec3(meshEntries.at(i)->dcolor.r, meshEntries.at(i)->dcolor.r, meshEntries.at(i)->dcolor.r);
-		glm::vec3 specular = glm::vec3(meshEntries.at(i)->scolor.r, meshEntries.at(i)->scolor.r, meshEntries.at(i)->scolor.r);
-		glm::vec3 ambient = glm::vec3(meshEntries.at(i)->acolor.r, meshEntries.at(i)->acolor.r, meshEntries.at(i)->acolor.r);
+		glm::vec3 diffuse = glm::vec3(meshEntries.at(i)->dcolor.r, meshEntries.at(i)->dcolor.g, meshEntries.at(i)->dcolor.b);
+		glm::vec3 specular = glm::vec3(meshEntries.at(i)->scolor.r, meshEntries.at(i)->scolor.g, meshEntries.at(i)->scolor.b);
+		glm::vec3 ambient = glm::vec3(meshEntries.at(i)->acolor.r, meshEntries.at(i)->acolor.g, meshEntries.at(i)->acolor.b);
 
 		if (glm::length(ambient) == 0) {
 			ambient = glm::vec3(0.3, 0.3, 0.3);
@@ -228,12 +295,28 @@ void Mesh::draw() {
 		if (shiness == 0)
 			shiness = 10.0f;
 
-		//glUniform3fv(shader->uniform("Kd"), 1, glm::value_ptr(diffuse));
-		//glUniform3fv(shader->uniform("Ka"), 1, glm::value_ptr(ambient));
-		//glUniform3fv(shader->uniform("Ks"), 1, glm::value_ptr(specular));
-		//glUniform1f(shader->uniform("shininess"), shiness);
+		glUniform3fv(shader->uniform("Kd"), 1, glm::value_ptr(diffuse));
+		glUniform3fv(shader->uniform("Ka"), 1, glm::value_ptr(ambient));
+		glUniform3fv(shader->uniform("Ks"), 1, glm::value_ptr(specular));
+		glUniform1f(shader->uniform("shininess"), shiness);
 
-		meshEntries.at(i)->render();
+		for (int j = 0; j < textures.size(); j++) {
+
+			std::string type;
+			if (textures[j].getType() == Texture::Type::DIFFUSE) {
+				type = "ColorTex";
+			}
+			else if (textures[j].getType() == Texture::Type::NORMAL) {
+				type = "NormalMapTex";
+			}
+
+			glActiveTexture(GL_TEXTURE0 + j);
+			glBindTexture(GL_TEXTURE_2D, textures[j].getIdNumber(0));
+			glUniform1i(shader->uniform(type), j);
+		}
+			
+		meshEntries.at(i)->render(shader);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	//shader->disable();
 }

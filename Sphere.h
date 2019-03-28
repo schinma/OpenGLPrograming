@@ -29,7 +29,7 @@ private:
 	float radius;
 	GLuint slices, stacks;
 
-	Texture texture;
+	Texture _texture;
 	ShaderProgram *_shader;
 
 	void generateVerts(float *, float *, float *, GLuint *);
