@@ -17,11 +17,11 @@ MyGlWindow::MyGlWindow(float w, float h)
 
 	m_color_cube = new ColorCube(m_TextureShader->getShaderProgram());
 	m_floor = new CheckeredFloor(50, 16);
-	m_sphere = new Sphere(2, 100, 100, m_TextureShader->getShaderProgram());
+	//m_sphere = new Sphere(2, 100, 100, m_TextureShader->getShaderProgram());
 	m_teapot = new VBOTeapot(8, glm::mat4(1.0));
 	m_teapot2 = new VBOTeapot(8, glm::mat4(1.0));
 	m_plane = new Plane(100, 20);
-	m_moutain = new Mesh("mount.blend1.obj", m_TextureShader->getShaderProgram());
+	m_moutain = new Mesh("sponza.obj", m_TextureShader->getShaderProgram());
 	m_ogre = new Mesh("bs_ears.obj", m_NormalMapShader->getShaderProgram());
 
 	glm::vec3 viewPoint(DEFAULT_VIEW_POINT[0], DEFAULT_VIEW_POINT[1], DEFAULT_VIEW_POINT[2]);
@@ -100,29 +100,29 @@ void MyGlWindow::draw(Parameter param)
 	m_TextureShader->getShaderProgram()->use();
 	m_TextureShader->setUniforms(view, param);
 	
-	draw_object(m_color_cube, m_TextureShader, projection, view, glm::vec3(0, 1, 0), std::vector<glm::vec4>{glm::vec4(-90, 1, 0, 0)});
+	//draw_object(m_color_cube, m_TextureShader, projection, view, glm::vec3(0, 1, 0), std::vector<glm::vec4>{glm::vec4(-90, 1, 0, 0)});
 
 	//rotAngle++;
-	draw_object(m_sphere, m_TextureShader, projection, view, glm::vec3(0, 3, 5), std::vector<glm::vec4>{glm::vec4(270, 1, 0, 0), glm::vec4(rotAngle, 0, 0, 1)});
+	//draw_object(m_sphere, m_TextureShader, projection, view, glm::vec3(0, 3, 5), std::vector<glm::vec4>{glm::vec4(270, 1, 0, 0), glm::vec4(rotAngle, 0, 0, 1)});
 
-	draw_object(m_moutain, m_TextureShader, projection, view, glm::vec3(10, 4, 10), std::vector<glm::vec4>{glm::vec4(45, 0, 1, 0)});
+	draw_object(m_moutain, m_TextureShader, projection, view, glm::vec3(0, 0, 0), std::vector<glm::vec4>{glm::vec4(45, 0, 1, 0)}, glm::vec3(0.1, 0.1, 0.1));
 
 	m_TextureShader->getShaderProgram()->disable();
 
 	//Normal Map Shader
-	m_NormalMapShader->getShaderProgram()->use();
+	/*m_NormalMapShader->getShaderProgram()->use();
 	m_NormalMapShader->setUniforms(view, param);
 
-	draw_object(m_ogre, m_NormalMapShader, projection, view, glm::vec3(-10, 4, -10), std::vector<glm::vec4>{}, glm::vec3(5, 5, 5));
+	draw_object(m_ogre, m_NormalMapShader, projection, view, glm::vec3(0, 4, 0), std::vector<glm::vec4>{}, glm::vec3(5, 5, 5));
 	
-	m_NormalMapShader->getShaderProgram()->disable();
+	m_NormalMapShader->getShaderProgram()->disable();*/
 	
-	m_PhongShader->getShaderProgram()->use();	
+	/*m_PhongShader->getShaderProgram()->use();	
 	m_PhongShader->setUniforms(view, param);
 	//draw the floor
 	draw_object(m_plane, m_PhongShader, projection, view, glm::vec3(0, 0, 0), std::vector<glm::vec4>{glm::vec4(0, 0, 0, 0)});
 	
-	m_PhongShader->getShaderProgram()->disable();
+	m_PhongShader->getShaderProgram()->disable();*/
 
 }
 

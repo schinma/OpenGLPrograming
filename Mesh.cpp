@@ -18,9 +18,10 @@
 
 
 
-Mesh::MeshEntry::MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m)
+Mesh::MeshEntry::MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m, std::vector<Texture> tex)
 {
 	parent = m;
+	textures = tex;
 
 	vbo[VERTEX_BUFFER] = NULL;
 	vbo[TEXCOORD_BUFFER] = NULL;
@@ -150,8 +151,9 @@ Mesh::MeshEntry::MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m)
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);	
+	glBindVertexArray(0);
 }
+
 
 /**
 *	Deletes the allocated OpenGL buffers
@@ -182,11 +184,29 @@ Mesh::MeshEntry::~MeshEntry() {
 **/
 void Mesh::MeshEntry::render(ShaderProgram *shader) {
 
+	for (int j = 0; j < textures.size(); j++) {
+
+		std::string type;
+		if (textures[j].getType() == Texture::Type::DIFFUSE) {
+			type = "ColorTex";
+		}
+		else if (textures[j].getType() == Texture::Type::NORMAL) {
+			type = "NormalMapTex";
+		}
+
+		glActiveTexture(GL_TEXTURE0 + j);
+		glUniform1i(shader->uniform(type), j);
+		glBindTexture(GL_TEXTURE_2D, textures[j].getIdNumber(0));
+
+	}
+
 	glBindVertexArray(vao);
 		int size;
 		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 		glDrawElements(GL_TRIANGLES, size/ sizeof(unsigned int), GL_UNSIGNED_INT, NULL);
 	glBindVertexArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /**
@@ -209,45 +229,50 @@ Mesh::Mesh(const char *filename, ShaderProgram * sh)
 		return;
 	}
 
-	for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
+	for (int i = 0; i < scene->mNumMeshes; ++i) {
 
-		const aiMaterial *pMaterial = scene->mMaterials[i];
+		std::vector<Texture> textures;
+		aiMesh *mesh = scene->mMeshes[i];
+
+		const aiMaterial *pMaterial = scene->mMaterials[mesh->mMaterialIndex];
 
 		if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-			aiString path;
-			if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path,
-				NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-				std::string fullPath = path.data;
-				Texture texture(Texture::DIFFUSE);
-				std::cout << fullPath << std::endl;
-				texture.loadTexture(fullPath);
-				textures.push_back(texture);
-			}
+			textures = loadTextures(pMaterial, aiTextureType_DIFFUSE, Texture::DIFFUSE);
+		}
+		if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+			std::vector<Texture> normText = loadTextures(pMaterial, aiTextureType_NORMALS, Texture::NORMAL);
+			textures.insert(textures.end(), normText.begin(), normText.end());
 		}
 
-		if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
-			aiString path;
-			if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &path,
-				NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-				std::string fullPath = path.data;
-				Texture texture(Texture::NORMAL);
-				texture.loadTexture(fullPath);
-				textures.push_back(texture);
+		meshEntries.push_back(new Mesh::MeshEntry(mesh, scene, this, textures));
+	}	
+}
+
+
+std::vector<Texture> Mesh::loadTextures(const aiMaterial *mat, aiTextureType type, Texture::Type texType)
+{
+	std::vector<Texture> textures;
+	aiString path;
+
+	if (mat->GetTexture(type, 0, &path,
+		NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+		std::string fullPath = path.data;
+		bool load = true;
+		for (int i = 0; i < texturesLoaded.size(); i++) {
+			if (texturesLoaded[i].getPath() == fullPath) {
+				textures.push_back(texturesLoaded[i]);
+				load = false;
+				break;
 			}
+		}
+		if (load) {
+			Texture texture(texType);
+			texture.loadTexture(fullPath);
+			textures.push_back(texture);
+			texturesLoaded.push_back(texture);
 		}
 	}
-
-	/*Texture texture(Texture::DIFFUSE);
-	texture.loadTexture("ogre_diffuse.png");
-	textures.push_back(texture);
-
-	Texture texture2(Texture::NORMAL);
-	texture.loadTexture("ogre_normalmap.png");
-	textures.push_back(texture2);*/
-
-	for (int i = 0; i < scene->mNumMeshes; ++i) {
-		meshEntries.push_back(new Mesh::MeshEntry(scene->mMeshes[i], scene, this));
-	}	
+	return (textures);
 }
 
 /**
@@ -300,23 +325,7 @@ void Mesh::draw() {
 		glUniform3fv(shader->uniform("Ks"), 1, glm::value_ptr(specular));
 		glUniform1f(shader->uniform("shininess"), shiness);
 
-		for (int j = 0; j < textures.size(); j++) {
-
-			std::string type;
-			if (textures[j].getType() == Texture::Type::DIFFUSE) {
-				type = "ColorTex";
-			}
-			else if (textures[j].getType() == Texture::Type::NORMAL) {
-				type = "NormalMapTex";
-			}
-
-			glActiveTexture(GL_TEXTURE0 + j);
-			glBindTexture(GL_TEXTURE_2D, textures[j].getIdNumber(0));
-			glUniform1i(shader->uniform(type), j);
-		}
-			
 		meshEntries.at(i)->render(shader);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	//shader->disable();
 }

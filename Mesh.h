@@ -22,17 +22,18 @@ public:
 		GLuint vao;
 		GLuint vbo[6];
 
+
 		unsigned int elementCount;
 		aiColor3D dcolor;
 		aiColor3D acolor;
 		aiColor3D scolor;
 		float shininessStrength;
-		std::vector<Texture> texture;
-		MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m);
+		std::vector<Texture> textures;
+		MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m, std::vector<Texture> textures);
 		~MeshEntry();
 		Mesh * parent;
-		void render(ShaderProgram *shader);	
-	};
+		void render(ShaderProgram *shader);
+		};
 		
 public:
 	Mesh(const char *filename, ShaderProgram * sh);
@@ -40,8 +41,8 @@ public:
 
 	
 	std::vector<MeshEntry*> meshEntries;
-	std::vector<Texture> textures;
-
+	std::vector<Texture> texturesLoaded;
 	ShaderProgram * shader;
-	void draw();	
+	void draw();
+	std::vector<Texture> loadTextures(const aiMaterial *mat, aiTextureType type, Texture::Type texType);
 };

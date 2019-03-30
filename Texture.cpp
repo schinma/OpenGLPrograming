@@ -17,12 +17,13 @@ Texture::~Texture()
 
 void Texture::loadTexture(const std::string &file)
 {
-	path = "img/" + file;
+	path = file;
+	fullPath = "img/" + path;
 
-	std::cout << "Loading texture :" + file + " at path :" + path << std::endl;
+	std::cout << "Loading texture :" + file + " at path :" + fullPath << std::endl;
 
 	int width, height, channel;
-	unsigned char *texture_img = stbi_load(path.c_str(), &width, &height, &channel, 0);
+	unsigned char *texture_img = stbi_load(fullPath.c_str(), &width, &height, &channel, 0);
 
 	if (texture_img) {
 		glActiveTexture(GL_TEXTURE0);

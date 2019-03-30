@@ -31,6 +31,7 @@ private:
 
 	GLuint tex_2d[2];
 	std::string path;
+	std::string fullPath;
 	Type type;
 
 };
