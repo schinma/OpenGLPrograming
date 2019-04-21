@@ -23,6 +23,13 @@
 #include "TextureShader.h"
 #include "PhongShader.h"
 #include "NormalMapShader.h"
+#include "ShaderSkyBox.h"
+#include "SkyBox.h"
+#include "RefractShader.h"
+#include "textureManager.h"
+#include "TextureViewer.h"
+#include "fboManager.h"
+
 
 class MyGlWindow {
 public:
@@ -39,33 +46,27 @@ private:
 	TextureShader *m_TextureShader;
 	PhongShader *m_PhongShader;
 	NormalMapShader *m_NormalMapShader;
-	
-	ShaderProgram *m_shaderProgramSil;
-	ShaderProgram *m_shaderProgramFloor;
-	
+	RefractShader *m_SkyboxShader;
+
+	FboManager *fbo;
+	TextureViewer *ctv;
+	TextureManager texManager;
+	GLuint fbo_depthId;
+
+
 	float m_width;
 	float m_height;
 	
 	//Objects
-	IObject *m_wire_cube;
-	IObject *m_color_cube;
-	RedLine *m_line;
-	IObject *m_sphere;
-	IObject *m_teapot;
-	IObject *m_teapot2;
-	CheckeredFloor *m_floor;
-	IObject *m_buddha;
-	IObject *m_dragon;
-	IObject *m_bunny;
-	IObject *m_plane;
-	IObject *m_moutain;
-	IObject *m_ogre;
+	IObject *m_skybox;
+	IObject *m_mesh;
+	IObject *m_cube;
 
 	Model m_model;
 
 	void setupBuffer();
 	void draw_floor(glm::mat4 proj, glm::mat4 view);
-	void draw_object(IObject *objectn, Shader *shader, glm::mat4 projection, glm::mat4 view, glm::vec3 translation, 
+	void draw_object(Parameter param, IObject *objectn, Shader *shader, glm::mat4 projection, glm::mat4 view, glm::vec3 translation, 
 		std::vector<glm::vec4> rotations, glm::vec3 scale = glm::vec3(1, 1, 1));
 };
 

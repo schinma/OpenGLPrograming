@@ -14,6 +14,7 @@ public:
 	~Shader();
 
 	virtual void addUniforms() = 0;
+	virtual void setUniforms(glm::mat4 view, Parameter param) = 0;
 	ShaderProgram *getShaderProgram();
 
 protected:

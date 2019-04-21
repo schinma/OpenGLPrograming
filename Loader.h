@@ -52,6 +52,9 @@ private:
 	// Map of uniforms and their binding locations
 	std::map<std::string, int> uniformMap;
 
+	//Map of subroutine and theur binding locations
+	std::map<std::string, int> subroutineMap;
+
 	// Has this shader program been initialised?
 	bool initialised;
 
@@ -395,6 +398,26 @@ public:
 
 		// Return the uniform location
 		return uniformMap[uniformName];
+	}
+
+	int addSubroutine(GLenum shadertype, const  std::string uniformName)
+	{
+		subroutineMap[uniformName] = glGetSubroutineIndex(programId, shadertype, uniformName.c_str());
+		return subroutineMap[uniformName];
+	}
+
+	GLuint subroutine(const std::string uniformName)
+	{
+		static std::map<std::string, int>::const_iterator subroutineIter;
+
+		subroutineIter = subroutineMap.find(uniformName);
+
+		if (subroutineIter == subroutineMap.end())
+		{
+			std::cout << "Could not find subroutine in shader program: " << uniformName << std::endl;
+		}
+
+		return subroutineMap[uniformName];
 	}
 
 }; // End of class

@@ -1,0 +1,44 @@
+﻿  CheckeredFloor.cpp
+e:\cours\computer_graphics\project2\project2\checkeredfloor.h(7): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  ColorCube.cpp
+e:\cours\computer_graphics\project2\project2\colorcube.h(5): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_glfw.cpp
+e:\cours\computer_graphics\project2\project2\imgui\imgui_impl_glfw.cpp(35): fatal error C1083: Impossible d'ouvrir le fichier include : 'GLFW/glfw3.h' : No such file or directory
+  imgui_impl_opengl3.cpp
+e:\cours\computer_graphics\project2\project2\imgui\imgui_impl_opengl3.cpp(86): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  imgui_widgets.cpp
+  Mesh.cpp
+e:\cours\computer_graphics\project2\project2\mesh.h(3): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  NormalMapShader.cpp
+e:\cours\computer_graphics\project2\project2\loader.h(25): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  PhongShader.cpp
+e:\cours\computer_graphics\project2\project2\loader.h(25): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  Plane.cpp
+e:\cours\computer_graphics\project2\project2\plane.h(6): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  RedLine.cpp
+e:\cours\computer_graphics\project2\project2\redline.h(7): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  Shader.cpp
+e:\cours\computer_graphics\project2\project2\loader.h(25): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  Source.cpp
+e:\cours\computer_graphics\project2\project2\source.cpp(1): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  MyGlWindow.cpp
+e:\cours\computer_graphics\project2\project2\myglwindow.h(7): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  Sphere.cpp
+e:\cours\computer_graphics\project2\project2\sphere.h(4): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  SpotLight.cpp
+  Texture.cpp
+e:\cours\computer_graphics\project2\project2\texture.h(6): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  TextureShader.cpp
+e:\cours\computer_graphics\project2\project2\loader.h(25): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  Génération de code en cours...
+  Compilation en cours...
+  vboteapot.cpp
+e:\cours\computer_graphics\project2\project2\vboteapot.h(4): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  Viewer.cpp
+e:\cours\computer_graphics\project2\project2\viewer.h(22): fatal error C1083: Impossible d'ouvrir le fichier include : 'glm/glm.hpp' : No such file or directory
+  WireCube.cpp
+e:\cours\computer_graphics\project2\project2\wirecube.h(7): fatal error C1083: Impossible d'ouvrir le fichier include : 'GL/glew.h' : No such file or directory
+  Génération de code en cours...

@@ -23,6 +23,7 @@ public:
 
 	void loadTexture(const std::string &file);
 	void loadTexture(const std::string &file, const std::string &file2);
+	void loadCubeMapTexture();
 	GLuint getIdNumber(int i) const;
 	Texture::Type getType() const;
 	const std::string getPath() const;

@@ -14,14 +14,9 @@
 /**
 *	Constructor, loading the specified aiMesh
 **/
-
-
-
-
-Mesh::MeshEntry::MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m, std::vector<Texture> tex)
+Mesh::MeshEntry::MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m)
 {
 	parent = m;
-	textures = tex;
 
 	vbo[VERTEX_BUFFER] = NULL;
 	vbo[TEXCOORD_BUFFER] = NULL;
@@ -152,8 +147,48 @@ Mesh::MeshEntry::MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m, std::ve
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	/* Loading the different texture types */
+	const aiMaterial *pMaterial = scene->mMaterials[mesh->mMaterialIndex];
+
+	if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+		loadTextures(pMaterial, aiTextureType_DIFFUSE, Texture::DIFFUSE, m);
+	}
+	/*if (pMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0) {
+		loadTextures(pMaterial, aiTextureType_HEIGHT, Texture::NORMAL, m);
+	}*/
 }
 
+
+/*
+*	Load the textures 
+*/
+void Mesh::MeshEntry::loadTextures(const aiMaterial *mat, aiTextureType type, Texture::Type texType, Mesh *m)
+{
+	aiString path;
+
+	if (mat->GetTexture(type, 0, &path,
+		NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+		std::string fullPath = path.data;
+		bool load = true;
+		for (int i = 0; i < m->texturesLoaded.size(); i++) {
+			if (m->texturesLoaded[i].getPath() == fullPath) {
+				textures.push_back(m->texturesLoaded[i]);
+				load = false;
+				break;
+			}
+		}
+		if (load) {
+			Texture texture(texType);
+			texture.loadTexture(fullPath);
+			textures.push_back(texture);
+			m->texturesLoaded.push_back(texture);
+		}
+	}
+	else if (type == aiTextureType_NORMALS) {
+		std::cout << "bleh\n";
+	}
+}
 
 /**
 *	Deletes the allocated OpenGL buffers
@@ -230,49 +265,10 @@ Mesh::Mesh(const char *filename, ShaderProgram * sh)
 	}
 
 	for (int i = 0; i < scene->mNumMeshes; ++i) {
-
-		std::vector<Texture> textures;
 		aiMesh *mesh = scene->mMeshes[i];
 
-		const aiMaterial *pMaterial = scene->mMaterials[mesh->mMaterialIndex];
-
-		if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-			textures = loadTextures(pMaterial, aiTextureType_DIFFUSE, Texture::DIFFUSE);
-		}
-		if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
-			std::vector<Texture> normText = loadTextures(pMaterial, aiTextureType_NORMALS, Texture::NORMAL);
-			textures.insert(textures.end(), normText.begin(), normText.end());
-		}
-
-		meshEntries.push_back(new Mesh::MeshEntry(mesh, scene, this, textures));
+		meshEntries.push_back(new Mesh::MeshEntry(mesh, scene, this));
 	}	
-}
-
-
-std::vector<Texture> Mesh::loadTextures(const aiMaterial *mat, aiTextureType type, Texture::Type texType)
-{
-	std::vector<Texture> textures;
-	aiString path;
-
-	if (mat->GetTexture(type, 0, &path,
-		NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-		std::string fullPath = path.data;
-		bool load = true;
-		for (int i = 0; i < texturesLoaded.size(); i++) {
-			if (texturesLoaded[i].getPath() == fullPath) {
-				textures.push_back(texturesLoaded[i]);
-				load = false;
-				break;
-			}
-		}
-		if (load) {
-			Texture texture(texType);
-			texture.loadTexture(fullPath);
-			textures.push_back(texture);
-			texturesLoaded.push_back(texture);
-		}
-	}
-	return (textures);
 }
 
 /**
@@ -292,7 +288,7 @@ Mesh::~Mesh(void)
 **/
 void Mesh::draw() {
 
-	//shader->use();
+	shader->use();
 
 	for (int i = 0; i < meshEntries.size(); ++i) {
 
@@ -327,5 +323,5 @@ void Mesh::draw() {
 
 		meshEntries.at(i)->render(shader);
 	}
-	//shader->disable();
+	shader->disable();
 }

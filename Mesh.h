@@ -29,10 +29,11 @@ public:
 		aiColor3D scolor;
 		float shininessStrength;
 		std::vector<Texture> textures;
-		MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m, std::vector<Texture> textures);
+		MeshEntry(aiMesh *mesh, const aiScene* scene, Mesh * m);
 		~MeshEntry();
 		Mesh * parent;
 		void render(ShaderProgram *shader);
+		void loadTextures(const aiMaterial *mat, aiTextureType type, Texture::Type texType, Mesh *m);
 		};
 		
 public:

@@ -35,9 +35,13 @@
     <ClCompile Include="TextureShader.cpp" />
     <ClCompile Include="PhongShader.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="NormalMapShader.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
+    <ClCompile Include="textureManager.cpp" />
+    <ClCompile Include="TextureViewer.cpp" />
+    <ClCompile Include="fboManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stb_image.h" />
     <ClInclude Include="ColorCube.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -110,12 +114,40 @@
     <ClInclude Include="WireCube.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="TextureShader.h" />
     <ClInclude Include="Material.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="PhongShader.h" />
     <ClInclude Include="Texture.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalMapShader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureShader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="PhongShader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderSkyBox.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="RefractShader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureViewer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="fboManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="textureManager.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -166,6 +198,30 @@
       <Filter>shader</Filter>
     </None>
     <None Include="shaders\spotlight.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shaders\normal_map.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shaders\normal_map.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shaders\cube_map.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shaders\cube_map.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shaders\cube_map_refraction.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shaders\cube_map_refraction.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shaders\textureViewer.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shaders\textureViewer.vert">
       <Filter>shader</Filter>
     </None>
   </ItemGroup>

@@ -105,8 +105,6 @@ void Sphere::setup(float *vertices, float *normals, unsigned int *el, float *tex
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements * sizeof(GLuint), el, GL_STATIC_DRAW);
 
 	glBindVertexArray(0);			//unbinding
-
-
 }
 
 void Sphere::draw() 

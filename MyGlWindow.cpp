@@ -13,16 +13,17 @@ MyGlWindow::MyGlWindow(float w, float h)
 	m_width = w;
 	m_height = h;
 
-	setupBuffer();
+	m_TextureShader = new TextureShader();
+	//m_SkyboxShader = new RefractShader("cube_map_refraction");
 
-	m_color_cube = new ColorCube(m_TextureShader->getShaderProgram());
-	m_floor = new CheckeredFloor(50, 16);
-	//m_sphere = new Sphere(2, 100, 100, m_TextureShader->getShaderProgram());
-	m_teapot = new VBOTeapot(8, glm::mat4(1.0));
-	m_teapot2 = new VBOTeapot(8, glm::mat4(1.0));
-	m_plane = new Plane(100, 20);
-	m_moutain = new Mesh("sponza.obj", m_TextureShader->getShaderProgram());
-	m_ogre = new Mesh("bs_ears.obj", m_NormalMapShader->getShaderProgram());
+	//add uniform variables
+
+	m_TextureShader->addUniforms();
+	//m_PhongShader->addUniforms();
+	//m_NormalMapShader->addUniforms();
+	//m_SkyboxShader->addUniforms();
+
+	m_mesh = new Mesh("mount.blend1.obj", m_TextureShader->getShaderProgram());
 
 	glm::vec3 viewPoint(DEFAULT_VIEW_POINT[0], DEFAULT_VIEW_POINT[1], DEFAULT_VIEW_POINT[2]);
 	glm::vec3 viewCenter(DEFAULT_VIEW_CENTER[0], DEFAULT_VIEW_CENTER[1], DEFAULT_VIEW_CENTER[2]);
@@ -30,23 +31,16 @@ MyGlWindow::MyGlWindow(float w, float h)
 
 	float aspect = (w / (float)h);
 	m_viewer = new Viewer(viewPoint, viewCenter, upVector, 45.0f, aspect);
+
+	setupBuffer();
 }
 
 MyGlWindow::~MyGlWindow()
 {
-	delete(m_floor);
-	delete(m_color_cube);
-	delete(m_sphere);
-	delete(m_teapot);
-	delete(m_plane);
-	delete(m_TextureShader);
-	delete(m_PhongShader);
-	delete(m_shaderProgramFloor);
-	delete(m_shaderProgramSil);
-	delete(m_shaderProgramFloor);
 	delete(m_viewer);
-	delete(m_NormalMapShader);
-	delete(m_ogre);
+	delete(m_mesh);
+	//delete(m_NormalMapShader);
+	//delete(m_SkyboxShader);
 }
 
 void MyGlWindow::resize(int width, int height) {
@@ -56,25 +50,23 @@ void MyGlWindow::resize(int width, int height) {
 
 void MyGlWindow::setupBuffer()
 {
-	m_TextureShader = new TextureShader();
-	m_PhongShader = new PhongShader();
-	m_NormalMapShader = new NormalMapShader();
 
-	m_shaderProgramSil = new ShaderProgram();
-	m_shaderProgramSil->initFromFiles("shaders/silhouette.vert", "shaders/silhouette.frag");	
+	ctv = new TextureViewer(0, "shaders/textureViewer.vert", "shaders/textureViewer.frag");
 
-	m_shaderProgramFloor = new ShaderProgram();
-	m_shaderProgramFloor->initFromFiles("shaders/simple.vert", "shaders/simple.frag");
+	texManager.createTexture("render_tex", "", 800, 800, GL_NEAREST, GL_RGB, GL_RGB, false);
+	texManager.createTexture("depth_tex", "", 800, 800, GL_LINEAR, GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, true);
 	
-	//add uniform variables
-	
-	m_TextureShader->addUniforms();
-	m_PhongShader->addUniforms();
-	m_NormalMapShader->addUniforms();
+	fbo = new FboManager();
 
-	m_shaderProgramSil->addUniform("mvp");
-	m_shaderProgramSil->addUniform("u_offset");
-	m_shaderProgramSil->addUniform("u_color");
+	fbo->initFbo();
+	fbo->bindToFbo(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texManager["render_tex"]);
+	fbo->bindToFbo(GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texManager["depth_tex"]);
+	fbo->setDrawBuffers();
+
+	if (!fbo->checkFboStatus()) {
+		std::cout << "error with fbo" << std::endl;
+		return;
+	}
 }
 
 void MyGlWindow::draw(Parameter param)
@@ -89,50 +81,24 @@ void MyGlWindow::draw(Parameter param)
 	glm::mat4 view = lookAt(eye, look, up);
 	glm::mat4 projection = glm::perspective(45.0f, m_width / m_height, 0.1f, 500.0f);
 
-	//draw_floor(projection, view);
-
-	glEnable(GL_CULL_FACE);
+	/*glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 
-	//Texture Shader
-	m_TextureShader->getShaderProgram()->use();
-	m_TextureShader->setUniforms(view, param);
-	
-	//draw_object(m_color_cube, m_TextureShader, projection, view, glm::vec3(0, 1, 0), std::vector<glm::vec4>{glm::vec4(-90, 1, 0, 0)});
 
-	//rotAngle++;
-	//draw_object(m_sphere, m_TextureShader, projection, view, glm::vec3(0, 3, 5), std::vector<glm::vec4>{glm::vec4(270, 1, 0, 0), glm::vec4(rotAngle, 0, 0, 1)});
-
-	draw_object(m_moutain, m_TextureShader, projection, view, glm::vec3(0, 0, 0), std::vector<glm::vec4>{glm::vec4(45, 0, 1, 0)}, glm::vec3(0.1, 0.1, 0.1));
-
-	m_TextureShader->getShaderProgram()->disable();
-
-	//Normal Map Shader
-	/*m_NormalMapShader->getShaderProgram()->use();
-	m_NormalMapShader->setUniforms(view, param);
-
-	draw_object(m_ogre, m_NormalMapShader, projection, view, glm::vec3(0, 4, 0), std::vector<glm::vec4>{}, glm::vec3(5, 5, 5));
-	
-	m_NormalMapShader->getShaderProgram()->disable();*/
-	
-	/*m_PhongShader->getShaderProgram()->use();	
-	m_PhongShader->setUniforms(view, param);
-	//draw the floor
-	draw_object(m_plane, m_PhongShader, projection, view, glm::vec3(0, 0, 0), std::vector<glm::vec4>{glm::vec4(0, 0, 0, 0)});
-	
-	m_PhongShader->getShaderProgram()->disable();*/
+	draw_object(param, m_mesh, m_TextureShader, projection, view, glm::vec3(0, 0, 0), std::vector<glm::vec4>{glm::vec4(0, 0, 0, 0)}, glm::vec3(1, 1, 1));
 
 }
 
-void MyGlWindow::draw_object(IObject *object, Shader * shader, glm::mat4 projection, glm::mat4 view, glm::vec3 translation, std::vector<glm::vec4> rotations, glm::vec3 scale)
+void MyGlWindow::draw_object(Parameter param ,IObject *object, Shader * shader, glm::mat4 projection, glm::mat4 view, glm::vec3 translation, std::vector<glm::vec4> rotations, glm::vec3 scale)
 {
 	glm::mat4 model;
 	glm::mat4 modelView;
 	glm::mat4 inverseModelView;
 	glm::mat3 normalMatrix;
 	glm::mat4 mvp;
+	glm::vec3 matColor = glm::vec3(0.4, 0.4, 0.4);
 
 	m_model.glPushMatrix();
 
@@ -150,32 +116,37 @@ void MyGlWindow::draw_object(IObject *object, Shader * shader, glm::mat4 project
 	normalMatrix = glm::mat3(glm::transpose(inverseModelView));
 	mvp = projection * view * model;
 
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo->getFboId());
+	glViewport(0, 0, m_width, m_height);
+	glClearColor(0.2f, 0.2f, .2f, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+	shader->getShaderProgram()->use();
+	shader->setUniforms(view, param);
+
 	glUniformMatrix4fv(shader->getShaderProgram()->uniform("ModelViewMatrix"), 1, GL_FALSE, glm::value_ptr(modelView));
 	glUniformMatrix3fv(shader->getShaderProgram()->uniform("NormalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
 	glUniformMatrix4fv(shader->getShaderProgram()->uniform("mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-	
-	glUniformMatrix4fv(m_shaderProgramSil->uniform("mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+
+	shader->getShaderProgram()->disable();
 
 	object->draw();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearColor(0.2f, 0.2f, .2f, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_DEPTH_TEST);
+
+	ctv->setTexture(texManager["render_tex"]);
+	ctv->draw();
+
 	m_model.glPopMatrix();
+
 }
 
 void MyGlWindow::draw_floor(glm::mat4 projection, glm::mat4 view)
 {
-	glm::mat4 mvp;
-	glm::mat4 model;
 
-	m_shaderProgramFloor->use();
-	
-	m_model.glPushMatrix(); 
-	m_model.glTranslate(0, 0, 0);
-	model = m_model.getMatrix();
-	mvp = projection * view * model;
-
-	glUniformMatrix4fv(m_shaderProgramFloor->uniform("mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-
-	m_floor->draw();
-	m_model.glPopMatrix();
-
-	m_shaderProgramFloor->disable();
 }

@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="CheckeredFloor.cpp" />
     <ClCompile Include="ColorCube.cpp" />
+    <ClCompile Include="fboManager.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -158,16 +159,20 @@
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="NormalMapShader.cpp" />
     <ClCompile Include="PhongShader.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="RedLine.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="MyGlWindow.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="textureManager.cpp" />
     <ClCompile Include="TextureShader.cpp" />
+    <ClCompile Include="TextureViewer.cpp" />
     <ClCompile Include="vboteapot.cpp" />
     <ClCompile Include="Viewer.cpp" />
     <ClCompile Include="WireCube.cpp" />
@@ -175,6 +180,7 @@
   <ItemGroup>
     <ClInclude Include="CheckeredFloor.h" />
     <ClInclude Include="ColorCube.h" />
+    <ClInclude Include="fboManager.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_glfw.h" />
@@ -189,16 +195,22 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ModelView.h" />
     <ClInclude Include="MyGlWindow.h" />
+    <ClInclude Include="NormalMapShader.h" />
     <ClInclude Include="PhongShader.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="RedLine.h" />
+    <ClInclude Include="RefractShader.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderSkyBox.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="teapotdata.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="textureManager.h" />
     <ClInclude Include="TextureShader.h" />
+    <ClInclude Include="TextureViewer.h" />
     <ClInclude Include="vboteapot.h" />
     <ClInclude Include="Viewer.h" />
     <ClInclude Include="WireCube.h" />
@@ -208,8 +220,14 @@
     <None Include="shaders\cartoon.vert" />
     <None Include="shaders\cube.frag" />
     <None Include="shaders\cube.vert" />
+    <None Include="shaders\cube_map.frag" />
+    <None Include="shaders\cube_map.vert" />
+    <None Include="shaders\cube_map_refraction.frag" />
+    <None Include="shaders\cube_map_refraction.vert" />
     <None Include="shaders\fog.frag" />
     <None Include="shaders\fog.vert" />
+    <None Include="shaders\normal_map.frag" />
+    <None Include="shaders\normal_map.vert" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\phong.vert" />
     <None Include="shaders\silhouette.frag" />
@@ -220,6 +238,8 @@
     <None Include="shaders\spotlight.vert" />
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
+    <None Include="shaders\textureViewer.frag" />
+    <None Include="shaders\textureViewer.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

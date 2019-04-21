@@ -20,7 +20,7 @@ void Texture::loadTexture(const std::string &file)
 	path = file;
 	fullPath = "img/" + path;
 
-	std::cout << "Loading texture :" + file + " at path :" + fullPath << std::endl;
+	std::cout << "Loading texture lololo:" + file + " at path :" + fullPath << std::endl;
 
 	int width, height, channel;
 	unsigned char *texture_img = stbi_load(fullPath.c_str(), &width, &height, &channel, 0);
@@ -46,6 +46,47 @@ void Texture::loadTexture(const std::string &file)
 	else {
 		std::cout << "Texture " + file + " failed to be loaded at path: " + path << std::endl;
 	}
+}
+
+void Texture::loadCubeMapTexture()
+{
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &tex_2d[0]);  //set the texID as a member variable
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex_2d[0]);
+
+	const char * suffixes[] = { "left", "right", "top", "down", "back", "front" };
+
+	GLuint targets[] = {
+	GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+	GL_TEXTURE_CUBE_MAP_POSITIVE_Y, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+	GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	};
+
+	for (int i = 0; i < 6; i++) {
+		int channel;
+		int width, height;
+		std::string filename;
+		filename = "img/" + std::string(suffixes[i]) + std::string(".JPG");
+
+		std::cout << "Loading texture :" + filename << std::endl;
+
+		unsigned char * image = stbi_load(filename.c_str(), &width, &height, &channel, 0);
+		glTexImage2D(targets[i], 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		
+		if (!image) {
+			std::cout << "Texture " + filename + " failed to be loaded" << std::endl;
+		}
+		stbi_image_free(image);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void Texture::loadTexture(const std::string &file, const std::string &file2)
